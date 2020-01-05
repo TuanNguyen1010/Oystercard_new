@@ -24,17 +24,6 @@ describe Oystercard do
     end 
   end 
 
-  describe 'deduct' do 
-    it 'responds to deduct with 1 argument' do
-      expect(oystercard).to respond_to(:deduct).with(1).argument 
-    end 
-
-    it 'decreases the balance by 5' do 
-      oystercard.top_up(10)
-      expect{oystercard.deduct(5)}.to change{oystercard.balance}.by(-5)
-    end 
-  end 
-
   describe 'in_journey?' do 
     it 'starts with in_journey? equals false' do 
       expect(oystercard).not_to be_in_journey
@@ -48,7 +37,7 @@ describe Oystercard do
       expect(oystercard).to be_in_journey
     end 
 
-    it 'raises an error when there is less than £1 balance' do
+    it 'raises an error when there is less than minimum fare on balance' do
       expect{ oystercard.touch_in }.to raise_error("Not enough balance available")
     end 
   end 
@@ -60,5 +49,11 @@ describe Oystercard do
       oystercard.touch_out
       expect(oystercard).not_to be_in_journey
     end 
+
+    it 'deduct the minimum fare from balance when touch out' do 
+      oystercard.top_up(10)
+      oystercard.touch_in
+      expect{oystercard.touch_out}.to change{oystercard.balance}.by(-Oystercard::MINIMUM_FARE)
+    end
   end 
 end
